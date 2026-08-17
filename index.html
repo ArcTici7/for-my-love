@@ -139,7 +139,7 @@
             overflow-y: auto;
             align-items: center;
             padding: 40px 20px;
-            display: block; /* override flex for scrolling */
+            display: block;
         }
         .notebook-wrapper {
             position: relative;
@@ -158,7 +158,7 @@
             gap: 20px;
         }
         @media (max-width: 768px) {
-            .deco-left, .deco-right { display: none; } /* Hide on small screens */
+            .deco-left, .deco-right { display: none; }
         }
         .notebook {
             width: 100%;
@@ -218,15 +218,53 @@
 
         /* Screen 6: Video */
         #screen6 { background-color: #000; }
-        video { max-width: 100%; max-height: 100%; width: auto; height: auto; outline: none; }
+        video { max-width: 100%; max-height: 70vh; width: auto; height: auto; outline: none; border-radius: 10px; }
+        
+        .video-text {
+            color: #ffb3c6;
+            font-size: 2rem;
+            margin-top: 25px;
+            font-family: 'Georgia', serif;
+            font-style: italic;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            z-index: 10;
+            opacity: 0;
+            animation: fadeInText 3s forwards 1s;
+        }
+
+        @keyframes fadeInText {
+            to { opacity: 1; }
+        }
+
+        /* Final Fade to Black Overlay */
+        #fade-to-black {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: black;
+            z-index: 9999;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 3s ease-in-out;
+        }
+
+        #fade-to-black.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
     </style>
 </head>
 <body>
 
-    <!-- Audio Element (Replace music.mp3 with your file) -->
+    <!-- Audio Element -->
     <audio id="bg-music" loop>
         <source src="music.mp3" type="audio/mpeg">
     </audio>
+
+    <!-- Fade to black overlay -->
+    <div id="fade-to-black"></div>
 
     <!-- Screen 1: Welcome -->
     <div id="screen1" class="screen active">
@@ -285,11 +323,11 @@
 
     <!-- Screen 6: Video -->
     <div id="screen6" class="screen">
-        <!-- Replace video.mp4 with your actual video file -->
         <video id="final-video" controls>
             <source src="video.mp4" type="video/mp4">
             Your browser does not support HTML video.
         </video>
+        <div class="video-text">I love you</div>
     </div>
 
     <script>
@@ -391,7 +429,7 @@
             
             setTimeout(() => {
                 nextScreen(2, 3, 'fade');
-            }, 3000); // Waits 3 seconds on the text before switching to the notebook
+            }, 3000);
         }
 
         // --- Bouquet Reveal Logic ---
@@ -403,13 +441,21 @@
 
         // --- Final Video Logic ---
         function playFinalVideo() {
-            // Optional: Pause background music when video starts
             document.getElementById('bg-music').pause(); 
-            
             nextScreen(5, 6, 'fade');
             const video = document.getElementById('final-video');
             video.play().catch(e => console.log("Video auto-play needs interaction"));
         }
+
+        // --- Fade out at the end of video ---
+        document.addEventListener("DOMContentLoaded", () => {
+            const video = document.getElementById('final-video');
+            video.addEventListener('ended', () => {
+                // Activating the fade-to-black overlay
+                document.getElementById('fade-to-black').classList.add('active');
+            });
+        });
+
     </script>
 </body>
 </html>
